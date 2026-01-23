@@ -1,0 +1,109 @@
+struct PerlinNoise
+    private static integer array perm[512]
+    private static real scale
+    private static boolean initialized = false
+    
+    private static method onInit takes nothing returns nothing
+        call .initializePermutation()
+        set .scale = GetRandomReal(0.04, 0.06)
+    endmethod
+    
+    private static method initializePermutation takes nothing returns nothing
+        local integer i = 0
+        if .initialized then
+            return
+        endif
+        loop
+            exitwhen i >= 256
+            set .perm[i] = i
+            set .perm[i + 256] = i
+            set i = i + 1
+        endloop
+        call .shuffle()
+        set .initialized = true
+    endmethod
+    
+    public static method shuffle takes nothing returns nothing
+        local integer i = 255
+        local integer j
+        local integer temp
+        loop
+            exitwhen i <= 0
+            set j = GetRandomInt(0, i)
+            set temp = .perm[i]
+            set .perm[i] = .perm[j]
+            set .perm[j] = temp
+            set i = i - 1
+        endloop
+        set i = 0
+        loop
+            exitwhen i >= 256
+            set .perm[i + 256] = .perm[i]
+            set i = i + 1
+        endloop
+    endmethod
+    
+    private static method fade takes real t returns real
+        return t * t * t * (t * ( t * 6.0 - 15.0) + 10.0)
+    endmethod
+    
+    private static method lerp takes real t, real a, real b returns real
+        return a + t * (b - a)
+    endmethod
+    
+    private static method grad takes integer hash, real x, real y returns real
+        local integer h = ModuloInteger(hash, 16)
+        local real u
+        local real v
+        if h < 8 then
+            set u = x
+        else
+            set u = y
+        endif
+        if h < 4 then
+            set v = y
+        elseif h == 12 or h == 14 then
+            set v = x
+        else
+            set v = 0.0
+        endif
+        if ModuloInteger(h,2) == 1 then
+            set u = -u
+        endif
+        if ModuloInteger(h / 2,2) == 1 then
+            set v = -v
+        endif
+        return u + v
+    endmethod
+    
+    public static method noise takes real x, real y returns real
+        local integer X
+        local integer Y
+        local real u
+        local real v
+        local integer aa
+        local integer ab
+        local integer ba
+        local integer bb
+        local real x1
+        local real x2
+        local real r
+        
+        set x = x * .scale
+        set y = y * .scale
+        set X = ModuloInteger(R2I(x), 256)
+        set Y = ModuloInteger(R2I(y), 256)
+        set x = ModuloReal(x, 1.0)
+        set y = ModuloReal(y, 1.0)
+        set u = .fade(x)
+        set v = .fade(y)
+        set aa = .perm[.perm[X] + Y]
+        set ab = .perm[.perm[X] + Y + 1]
+        set ba = .perm[.perm[X + 1] + Y]
+        set bb = .perm[.perm[X + 1] + Y + 1]
+        set x1 = .lerp(u, .grad(aa, x, y), .grad(ba, x - 1.0, y))
+        set x2 = .lerp(u, .grad(ab, x, y - 1.0), .grad(bb, x - 1.0, y - 1.0))
+        set r = .lerp(v, x1, x2)
+        return r * 0.8 + 0.5
+    endmethod
+endstruct
