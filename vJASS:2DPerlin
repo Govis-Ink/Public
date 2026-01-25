@@ -1,11 +1,52 @@
 struct PerlinNoise
     private static integer array perm[512]
+    private static real array gradX[16]
+    private static real array gradY[16]
     private static real scale
     private static boolean initialized = false
     
     private static method onInit takes nothing returns nothing
         call .initializePermutation()
-        set .scale = GetRandomReal(0.04, 0.06)
+        call .initializeGradients()
+        set .scale = GetRandomReal(0.03, 0.05)
+    endmethod
+    
+    private static method initializeGradients takes nothing returns nothing
+        local real sqrt12 = 1.0 / SquareRoot(2.0)
+        local real sqrt1125 = 1.0 / SquareRoot(1.25)
+        local real sqrt05125 = 0.5 / SquareRoot(1.25)
+        set .gradX[0] = sqrt12
+        set .gradY[0] = sqrt12
+        set .gradX[1] = -sqrt12
+        set .gradY[1] = sqrt12
+        set .gradX[2] = sqrt12
+        set .gradY[2] = -sqrt12
+        set .gradX[3] = -sqrt12
+        set .gradY[3] = -sqrt12
+        set .gradX[4] = 1.0
+        set .gradY[4] = 0.0
+        set .gradX[5] = -1.0
+        set .gradY[5] = 0.0
+        set .gradX[6] = 0.0
+        set .gradY[6] = 1.0
+        set .gradX[7] = 0.0
+        set .gradY[7] = -1.0
+        set .gradX[8] = sqrt1125
+        set .gradY[8] = sqrt05125
+        set .gradX[9] = -sqrt1125
+        set .gradY[9] = sqrt05125
+        set .gradX[10] = sqrt05125
+        set .gradY[10] = sqrt1125
+        set .gradX[11] = -sqrt05125
+        set .gradY[11] = sqrt1125
+        set .gradX[12] = sqrt05125
+        set .gradY[12] = -sqrt1125
+        set .gradX[13] = -sqrt05125
+        set .gradY[13] = -sqrt1125
+        set .gradX[14] = sqrt1125
+        set .gradY[14] = -sqrt05125
+        set .gradX[15] = -sqrt1125
+        set .gradY[15] = -sqrt05125
     endmethod
     
     private static method initializePermutation takes nothing returns nothing
@@ -53,27 +94,7 @@ struct PerlinNoise
     
     private static method grad takes integer hash, real x, real y returns real
         local integer h = ModuloInteger(hash, 16)
-        local real u
-        local real v
-        if h < 8 then
-            set u = x
-        else
-            set u = y
-        endif
-        if h < 4 then
-            set v = y
-        elseif h == 12 or h == 14 then
-            set v = x
-        else
-            set v = 0.0
-        endif
-        if ModuloInteger(h,2) == 1 then
-            set u = -u
-        endif
-        if ModuloInteger(h / 2,2) == 1 then
-            set v = -v
-        endif
-        return u + v
+        return gradX[h] * x + gradY[h] * y
     endmethod
     
     public static method noise takes real x, real y returns real
@@ -104,6 +125,28 @@ struct PerlinNoise
         set x1 = .lerp(u, .grad(aa, x, y), .grad(ba, x - 1.0, y))
         set x2 = .lerp(u, .grad(ab, x, y - 1.0), .grad(bb, x - 1.0, y - 1.0))
         set r = .lerp(v, x1, x2)
-        return r * 0.8 + 0.5
+        return r * 0.35 + 0.5
+    endmethod
+    
+    public static method fractal takes real x, real y, integer octaves, real persistence, real lacunarity returns real
+        local real total = 0.0
+        local real frequency = 1.0
+        local real amplitude = 1.0
+        local real maxValue = 0.0
+        local integer i = 0
+        
+        loop
+            exitwhen i >= octaves
+            set total = total + .noise(x * frequency, y * frequency) * amplitude
+            set maxValue = maxValue + amplitude
+            set amplitude = amplitude * persistence
+            set frequency = frequency * lacunarity
+            set i = i + 1
+        endloop
+        return total / maxValue
+    endmethod
+    
+    public static method normal takes real x, real y returns real
+        return .fractal(x, y, 4, 0.6, 2.2) * 2 - 0.5
     endmethod
 endstruct
