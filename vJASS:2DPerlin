@@ -8,7 +8,7 @@ struct PerlinNoise
     private static method onInit takes nothing returns nothing
         call .initializePermutation()
         call .initializeGradients()
-        set .scale = GetRandomReal(0.03, 0.05)
+        set .scale = GetRandomReal(0.02, 0.04)
     endmethod
     
     private static method initializeGradients takes nothing returns nothing
@@ -147,6 +147,6 @@ struct PerlinNoise
     endmethod
     
     public static method normal takes real x, real y returns real
-        return .fractal(x, y, 4, 0.6, 2.2) * 2 - 0.5
+        return .fractal(x, y, 3, 0.5, 2.2) * 2 - 0.5
     endmethod
 endstruct
