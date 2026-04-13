@@ -79,5 +79,4 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon='TheFunc.ico',
-    onedir=True,
 )
