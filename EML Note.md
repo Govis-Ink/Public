@@ -1,7 +1,8 @@
 
 # The EML (Exp - Minus - Log) by Andrzej Odrzywołek
 
-We have a function operator $ eml(x, y) := e^x - \ln{y} $ . The space $ M $ initially contains $ \lim_{a \to 1^+}{a} $ . If $ M $ contains $ p $ and $ q $ ,then $ eml(p,q) $ is added to $ M $ .
+We have a function operator $eml(x, y) := e^x - \ln{y}$ . The space $M$ initially contains $\lim_{a \to 1^+}{a}$ .
+If $M$ contains $p$ and $q$ ,then $eml(p,q)$ is added to $M$ .
 
 ## Operators
 
