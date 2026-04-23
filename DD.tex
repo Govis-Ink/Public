@@ -1,0 +1,65 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry}
+
+\geometry{a4paper, margin=1in}
+
+\title{The DD(DIV-DEC and DEC-DIV) Operator}
+\author{Govis}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+We can choose a function operator $ dd(x, y) $ . The set $ Q $ initially contains $ 1 $ . \\
+If $ Q $ contains $ p $ and $ q $ ,then $ dd(p,q) $ is added to $ Q $ .
+\end{center}
+
+\section*{DIV-DEC}
+
+\subsection*{operators}
+\begin{align*}
+dd(x, y) &= \frac{x}{y} - 1 \\
+dec(x) &= x - 1 = dd(x, 1) \\
+neg(x) &= -x = dd(dec(x), -1) \\
+inc(x) &= x + 1 = neg(dd(x, -1)) \\
+div(x, y) &= x / y = inc(dd(x, y)) \\
+rec(x) &= \frac{1}{x} = div(1, x) \\
+mul(x, y) &= x * y = div(x, rec(y)) \\
+sub(x, y) &= x - y = mul(dd(x, y), y) \\
+add(x, y) &= x + y = sub(x, neg(y))
+\end{align*}
+
+
+\subsection*{constants}
+\begin{align*}
+&1 \\
+&-1 = dec(dec(1))
+\end{align*}
+
+\section*{DEC-DIV}
+
+\subsection*{operators}
+\begin{align*}
+dd(x, y) &= \frac{x - 1}{y} \\
+dec(x) &= x - 1 = dd(x, 1) \\
+neg(x) &= -x = dec(dd(x, -1)) \\
+inc(x) &= x + 1 = dd(neg(x), -1) \\
+div(x, y) &= x / y = dd(inc(x), y) \\
+rec(x) &= \frac{1}{x} = div(1, x) \\
+mul(x, y) &= x * y = div(x, rec(y)) \\
+sub(x, y) &= x - y = dd(div(x, y), rec(y)) \\
+add(x, y) &= x + y = sub(x, neg(y))
+\end{align*}
+
+\subsection*{constants}
+\begin{align*}
+&1 \\
+&-1 = dec(dec(1))
+\end{align*}
+
+\section*{Question}
+Can you prove that Q is the set of all rational numbers?
+
+\end{document}
